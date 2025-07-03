@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: vibha-todo-list
+    env: python
+    buildCommand: ""
+    startCommand: "python src/app.py"
+    envVars:
+      - key: FLASK_ENV
+        value: production
+
