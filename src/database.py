@@ -1,11 +1,13 @@
 import sqlite3
+import os
+
+DB_PATH = os.path.join(os.path.dirname(__file__), 'tasks.db')
 
 # ---------- Initialize DB with Users and Tasks ----------
 def init_db():
-    conn = sqlite3.connect('tasks.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
-    # Create users table
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -14,7 +16,6 @@ def init_db():
         )
     ''')
 
-    # Create tasks table with foreign key to users
     c.execute('''
         CREATE TABLE IF NOT EXISTS tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -33,7 +34,7 @@ def init_db():
 
 # ---------- User Functions ----------
 def register_user(username, hashed_password):
-    conn = sqlite3.connect('tasks.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     try:
         c.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, hashed_password))
@@ -45,7 +46,7 @@ def register_user(username, hashed_password):
         conn.close()
 
 def get_user(username):
-    conn = sqlite3.connect('tasks.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute('SELECT * FROM users WHERE username = ?', (username,))
     user = c.fetchone()
@@ -54,7 +55,7 @@ def get_user(username):
 
 # ---------- Task Functions ----------
 def add_task(title, description, deadline, priority, user_id):
-    conn = sqlite3.connect('tasks.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute('''
         INSERT INTO tasks (title, description, deadline, priority, user_id)
@@ -64,7 +65,7 @@ def add_task(title, description, deadline, priority, user_id):
     conn.close()
 
 def get_all_tasks(user_id):
-    conn = sqlite3.connect('tasks.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute('SELECT * FROM tasks WHERE user_id = ?', (user_id,))
     tasks = c.fetchall()
@@ -72,14 +73,14 @@ def get_all_tasks(user_id):
     return tasks
 
 def mark_task_completed(task_id, user_id):
-    conn = sqlite3.connect('tasks.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute('UPDATE tasks SET completed = 1 WHERE id = ? AND user_id = ?', (task_id, user_id))
     conn.commit()
     conn.close()
 
 def delete_task(task_id, user_id):
-    conn = sqlite3.connect('tasks.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute('DELETE FROM tasks WHERE id = ? AND user_id = ?', (task_id, user_id))
     conn.commit()
